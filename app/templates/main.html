@@ -1,0 +1,78 @@
+<head>
+	<script>
+	function hide_password(rowid) {
+		document.getElementById(rowid).innerHTML = '********';
+	}
+	function get_password(rowid, callback) {
+		let data = {'rowid': rowid};
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '{{url_for('.decrypt_password')}}', true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(JSON.stringify(data));
+		xhr.onload = function () {
+			if (this.status == 200) {
+				var password = JSON.parse(this.responseText).password;
+				if (password === '') {
+					window.location.reload(true);
+				} else {
+					callback(password);
+				}
+			} else {
+				alert("Error while loading password!");
+			}
+		};
+	}
+	function reveal_password(rowid) {
+		callback = (password) => {
+			document.getElementById(rowid).innerHTML = password;
+			setTimeout(() => hide_password(rowid), 5000);
+		}
+		get_password(rowid, callback);
+	}
+	function copy_password(rowid) {
+		callback = (password) => navigator.clipboard.writeText(password);
+		get_password(rowid, callback);
+	}
+	</script>
+</head>
+<form action={{url_for('auth.logout')}}>
+	<h1>Welcome!</h1>
+	<input type="submit" value="Logout"/>
+</form>
+{% if verified %}
+	{% for id, service, password, _ in data %}
+	<div>
+		<label>{{service}}</label>
+		<label id="{{id}}">********</label>
+		<button onClick="reveal_password({{id}})">
+			Reveal
+		</button>
+		<button onClick="hide_password({{id}})">
+			Hide
+		</button>
+		<button onClick="copy_password({{id}})">
+			Copy to clipboard
+		</button>
+		<form action={{url_for('.delete')}} method="POST">
+			<input type="text" name="rowid" value="{{id}}" hidden/>
+			<input type="submit" value="Delete"/>
+		</form>
+	</div>
+	{% endfor %}
+	<form action={{url_for('.add')}} method="POST">
+		<input type="text" name="service" placeholder="Service"/>
+		<input type="password" name="password" placeholder="Password"/>
+		<input type="submit" value="Add"/>
+	</form>
+	{% if empty %}
+	<label>Both fields are required!</label>
+	{% endif %}
+{% else %}
+<form action={{url_for('.get_key')}} method="POST">
+	<input type="password" name="master" placeholder="Master password"/>
+	<input type="submit" value="Login"/>
+</form>
+	{% if wrong %}
+	<label>Wrong password</label>
+	{% endif %}
+{% endif %}

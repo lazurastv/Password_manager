@@ -1,0 +1,13 @@
+<h1>Super safe password manager</h1>
+<form action={{url_for('.login')}} method="POST">
+	<input type="text" name="username" placeholder="Username"/>
+	<input type="password" name="password" placeholder="Password"/>
+	<input type="submit" value="Login"/>
+</form>
+{% if failed %}
+<label>Wrong username or password</label>
+{% endif %}
+<form action={{url_for('.register')}}>
+	<label>Don't have an account?</label>
+	<input type="submit" value="Register"/>
+</form>
