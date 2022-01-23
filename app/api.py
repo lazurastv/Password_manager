@@ -3,9 +3,9 @@ from utils import *
 from sqlite import dao
 from datetime import datetime, timedelta
 
-def add_user(username, email, password, master):
+def add_user(username, password, master):
 	key, salt = derive_key(username, master)
-	dao.add_user(username, email, hash_password(password), hash_password(key), salt)
+	dao.add_user(username, hash_password(password), hash_password(key), salt)
 
 def add_entry(username, service, password):
 	nonce = generate_nonce()
@@ -36,7 +36,7 @@ def get_expiry():
 	return str(datetime.now() + timedelta(minutes=10))
 
 def user_exists(username):
-	return dao.get_email(username) is not None
+	return dao.get_hash(username) is not None
 
 def create_session(username):
 	session_id = generate_session_id()

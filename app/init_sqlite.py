@@ -15,7 +15,6 @@ if __name__ == "__main__":
 	sql.execute("""
 	CREATE TABLE user (
 		username VARCHAR(32),
-		email VARCHAR(64),
 		hash VARCHAR(60),
 		master_hash VARCHAR(60),
 		master_salt VARCHAR(60),

@@ -36,16 +36,15 @@ def register():
 @auth.route("create_account", methods=["POST"])
 def create_account():
 	username = get_from_form('username')
-	email = get_from_form('email')
 	password = get_from_form('password')
 	master = get_from_form('master')
-	if username == "" or email == "" or password == "" or master == "":
+	if username == "" or password == "" or master == "":
 		return render_template("register.html", blank=True)
 	elif weak_password(password) or weak_password(master):
 		return render_template("register.html", weak=True)
 	elif user_exists(username):
 		return render_template("register.html", copy=True)
-	add_user(username, email, password, master)
+	add_user(username, password, master)
 	return redirect(url_for(".login"), 307)
 
 @auth.route("unauth")

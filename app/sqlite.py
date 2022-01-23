@@ -10,11 +10,6 @@ class SqliteDAO:
 		self.db = sqlite3.connect(DATABASE_PATH)
 		self.sql = self.db.cursor()
 	
-	def get_email(self, username):
-		self.sql.execute("SELECT email FROM user WHERE username = ?;", (username,))
-		email, = self.sql.fetchone() or (None,)
-		return email
-	
 	def get_hash(self, username):
 		self.sql.execute("SELECT hash FROM user WHERE username = ?;", (username,))
 		hashed, = self.sql.fetchone() or (None,)
@@ -62,9 +57,9 @@ class SqliteDAO:
 			data[i] = rowid, b64decode(service), b64decode(password), b64decode(iv)
 		return data
 	
-	def add_user(self, username, email, hashed, master_hash, master_salt):
+	def add_user(self, username, hashed, master_hash, master_salt):
 		master_salt = b64encode(master_salt).decode()
-		self.sql.execute("INSERT INTO user (username, email, hash, master_hash, master_salt) VALUES (?, ?, ?, ?, ?);", (username, email, hashed, master_hash, master_salt))
+		self.sql.execute("INSERT INTO user (username, hash, master_hash, master_salt) VALUES (?, ?, ?, ?);", (username, hashed, master_hash, master_salt))
 		self.db.commit()
 
 	def add_session(self, sid, username, expiry):
